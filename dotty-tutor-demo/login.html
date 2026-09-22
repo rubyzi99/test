@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · Dotty Tutor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+<script src="assets/data.js"></script>
+
+
+</head>
+<body class="min-h-screen">
+<div class="flex">
+
+<main class="flex-1 min-h-screen">
+
+<div class="min-h-screen flex">
+  <div class="hidden lg:flex flex-col justify-between w-[42%] p-12 text-white" style="background:linear-gradient(160deg,#4338CA,#312B92 60%,#1e1a6b);">
+    <div class="flex items-center gap-2 text-lg font-bold display"><span class="text-2xl">🦉</span> Dotty Tutor</div>
+    <div>
+      <h1 class="display text-4xl font-bold leading-tight mb-4">教材数字化，<br>试题自己会审校。</h1>
+      <p class="text-white/75 text-[15px] leading-relaxed max-w-sm">上传一份 PDF 或扫描教材，Dotty Tutor 用 MinerU 做结构化识别，双模型审校加质量门禁把关，学生端随即拿到可练习的分层题目。</p>
+    </div>
+    <div class="text-white/50 text-xs">产品演示 Demo · 数据均为模拟</div>
+  </div>
+  <div class="flex-1 flex items-center justify-center p-8">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden flex items-center gap-2 text-lg font-bold display mb-8"><span class="text-2xl">🦉</span> Dotty Tutor</div>
+      <h2 class="display text-2xl font-bold mb-1">登录</h2>
+      <p class="text-[var(--ink-soft)] text-sm mb-6">选择身份，体验 Demo（无需真实密码）</p>
+      <div class="flex gap-2 mb-6 p-1 bg-[#EEEFF3] rounded-xl" id="roleTabs">
+        <button data-role="teacher" class="flex-1 py-2 rounded-lg text-sm font-semibold bg-white shadow-sm">教研管理员</button>
+        <button data-role="student" class="flex-1 py-2 rounded-lg text-sm font-semibold text-[var(--ink-soft)]">学生</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs font-medium text-[var(--ink-soft)]">账号</label>
+          <input value="ruby.teacher" id="acctInput" class="mt-1 w-full border border-[var(--line)] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)]">
+        </div>
+        <div>
+          <label class="text-xs font-medium text-[var(--ink-soft)]">密码</label>
+          <input type="password" value="••••••••" class="mt-1 w-full border border-[var(--line)] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[var(--brand)]">
+        </div>
+        <button id="loginBtn" class="btn btn-brand w-full mt-2">登录教研工作台</button>
+      </div>
+      <p class="text-xs text-[var(--ink-soft)] mt-6">Demo 提示：点击登录即可直接进入，无需输入真实信息。</p>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+let role = 'teacher';
+const acct = document.getElementById('acctInput');
+document.querySelectorAll('#roleTabs button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    role = btn.dataset.role;
+    document.querySelectorAll('#roleTabs button').forEach(b=>{b.classList.remove('bg-white','shadow-sm');b.classList.add('text-[var(--ink-soft)]');});
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-[var(--ink-soft)]');
+    acct.value = role==='teacher' ? 'ruby.teacher' : 'ruby.student';
+    document.getElementById('loginBtn').textContent = role==='teacher' ? '登录教研工作台' : '登录学生学习空间';
+  });
+});
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  window.location.href = role==='teacher' ? 'teacher-dashboard.html' : 'student-home.html';
+});
+</script>
+
+</body>
+</html>

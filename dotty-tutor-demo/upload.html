@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教材上传 · Dotty Tutor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+<script src="assets/data.js"></script>
+
+
+</head>
+<body class="min-h-screen">
+<div class="flex">
+
+    <aside class="w-60 shrink-0 border-r border-[var(--line)] bg-white/70 min-h-screen p-4 flex flex-col gap-1">
+      <div class="flex items-center gap-2 px-2 pb-4 mb-2 border-b border-[var(--line)]">
+        <span class="text-2xl">🦉</span>
+        <div>
+          <div class="font-bold display text-[15px] leading-none">Dotty Tutor</div>
+          <div class="text-[11px] text-[var(--ink-soft)] mt-1">教研工作台</div>
+        </div>
+      </div>
+      <a href="teacher-dashboard.html" class="nav-link "><span>🏠</span><span>工作台首页</span></a>
+<a href="upload.html" class="nav-link active"><span>📤</span><span>教材上传</span></a>
+<a href="review.html" class="nav-link "><span>🧪</span><span>AI 出题 & 审校</span></a>
+<a href="bank.html" class="nav-link "><span>📚</span><span>题库管理</span></a>
+      <a href="login.html" class="nav-link mt-auto text-[var(--ink-soft)]"><span>↩️</span><span>退出登录</span></a>
+    </aside>
+    
+<main class="flex-1 min-h-screen">
+
+<div class="p-8 max-w-5xl">
+  <h1 class="display text-2xl font-bold mb-1">教材上传</h1>
+  <p class="text-[var(--ink-soft)] text-sm mb-6">支持 PDF、图片扫描件；大文件将以异步任务处理，可在下方查看进度</p>
+
+  <div class="card p-6 mb-6">
+    <div id="dropzone" class="border-2 border-dashed border-[var(--line)] rounded-xl py-10 flex flex-col items-center justify-center cursor-pointer hover:border-[var(--brand)] transition">
+      <div class="text-3xl mb-2">📄</div>
+      <div class="text-sm font-medium">点击或拖拽文件到此处上传</div>
+      <div class="text-xs text-[var(--ink-soft)] mt-1">支持 .pdf .jpg .png，单个文件最大 50MB（Demo 模拟上传）</div>
+    </div>
+  </div>
+
+  <div class="card p-6" id="ocrPanel" style="display:none;">
+    <h2 class="font-semibold mb-4">MinerU OCR 结构化处理中 · <span id="fileNameLabel"></span></h2>
+    <div class="space-y-4" id="stepList"></div>
+    <div id="ocrDoneBox" class="mt-5 pt-5 border-t border-[var(--line)] hidden">
+      <div class="flex items-center gap-2 text-[var(--success)] text-sm font-semibold mb-3">✅ 结构化完成，已生成试题草稿</div>
+      <a href="review.html" class="btn btn-brand">前往 AI 出题 & 审校 →</a>
+    </div>
+  </div>
+
+  <div class="card p-6 mt-6">
+    <h2 class="font-semibold mb-3">已上传教材</h2>
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-xs text-[var(--ink-soft)] border-b border-[var(--line)]">
+        <th class="py-2 font-medium">文件名</th><th class="font-medium">页数</th><th class="font-medium">上传时间</th><th class="font-medium">状态</th>
+      </tr></thead>
+      <tbody id="materialsTable"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+document.getElementById('materialsTable').innerHTML = DOTTY_DATA.materials.map(m=>{
+  const map = {done:['已完成','tag-pass'], processing:['处理中','tag-pending']};
+  const [label,cls] = map[m.status];
+  return `<tr class="border-b border-[var(--line)] last:border-0">
+    <td class="py-2.5">${m.name}</td><td>${m.pages}</td><td>${m.uploadedAt}</td>
+    <td><span class="tag ${cls}">${label}</span></td></tr>`;
+}).join('');
+
+const steps = DOTTY_DATA.ocrSteps;
+document.getElementById('dropzone').addEventListener('click', ()=>{
+  document.getElementById('ocrPanel').style.display='block';
+  document.getElementById('fileNameLabel').textContent = '剑桥少儿英语 Starters 教材.pdf';
+  const stepList = document.getElementById('stepList');
+  stepList.innerHTML = steps.map((s,i)=>`
+    <div class="flex items-center gap-3" id="step${i}">
+      <div class="w-6 h-6 rounded-full border-2 border-[var(--line)] flex items-center justify-center text-xs" id="stepIcon${i}">${i+1}</div>
+      <div class="flex-1">
+        <div class="text-sm">${s}</div>
+        <div class="progress-track mt-1"><div class="progress-fill" style="width:0%" id="stepBar${i}"></div></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('ocrPanel').scrollIntoView({behavior:'smooth', block:'center'});
+  runSteps(0);
+});
+
+function runSteps(i){
+  if(i >= steps.length){
+    document.getElementById('ocrDoneBox').classList.remove('hidden');
+    return;
+  }
+  const bar = document.getElementById('stepBar'+i);
+  const icon = document.getElementById('stepIcon'+i);
+  let w = 0;
+  const t = setInterval(()=>{
+    w += 20;
+    bar.style.width = Math.min(w,100)+'%';
+    if(w>=100){
+      clearInterval(t);
+      icon.textContent = '✓';
+      icon.classList.add('bg-[var(--success)]','text-white','border-[var(--success)]');
+      runSteps(i+1);
+    }
+  }, 160);
+}
+</script>
+
+</body>
+</html>

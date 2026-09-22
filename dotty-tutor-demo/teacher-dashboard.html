@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教研工作台 · Dotty Tutor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+<script src="assets/data.js"></script>
+
+
+</head>
+<body class="min-h-screen">
+<div class="flex">
+
+    <aside class="w-60 shrink-0 border-r border-[var(--line)] bg-white/70 min-h-screen p-4 flex flex-col gap-1">
+      <div class="flex items-center gap-2 px-2 pb-4 mb-2 border-b border-[var(--line)]">
+        <span class="text-2xl">🦉</span>
+        <div>
+          <div class="font-bold display text-[15px] leading-none">Dotty Tutor</div>
+          <div class="text-[11px] text-[var(--ink-soft)] mt-1">教研工作台</div>
+        </div>
+      </div>
+      <a href="teacher-dashboard.html" class="nav-link active"><span>🏠</span><span>工作台首页</span></a>
+<a href="upload.html" class="nav-link "><span>📤</span><span>教材上传</span></a>
+<a href="review.html" class="nav-link "><span>🧪</span><span>AI 出题 & 审校</span></a>
+<a href="bank.html" class="nav-link "><span>📚</span><span>题库管理</span></a>
+      <a href="login.html" class="nav-link mt-auto text-[var(--ink-soft)]"><span>↩️</span><span>退出登录</span></a>
+    </aside>
+    
+<main class="flex-1 min-h-screen">
+
+<div class="p-8 max-w-6xl">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="display text-2xl font-bold">早上好，Ruby</h1>
+      <p class="text-[var(--ink-soft)] text-sm mt-1">这是今天的教研工作台概览</p>
+    </div>
+    <a href="upload.html" class="btn btn-brand">＋ 上传新教材</a>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="card p-4"><div class="text-xs text-[var(--ink-soft)]">教材总数</div><div class="text-2xl font-bold mt-1">3</div></div>
+    <div class="card p-4"><div class="text-xs text-[var(--ink-soft)]">待审校题目</div><div class="text-2xl font-bold mt-1 text-[var(--amber)]">6</div></div>
+    <div class="card p-4"><div class="text-xs text-[var(--ink-soft)]">已入库题目</div><div class="text-2xl font-bold mt-1 text-[var(--success)]">4</div></div>
+    <div class="card p-4"><div class="text-xs text-[var(--ink-soft)]">质量门禁拦截</div><div class="text-2xl font-bold mt-1 text-[var(--danger)]">2</div></div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-5">
+    <div class="col-span-2 card p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold">OCR 任务状态看板</h2>
+        <a href="upload.html" class="text-xs text-[var(--brand)] font-medium">查看全部 →</a>
+      </div>
+      <div class="space-y-3" id="materialList"></div>
+    </div>
+    <div class="card p-5">
+      <h2 class="font-semibold mb-3">待审校提醒</h2>
+      <p class="text-sm text-[var(--ink-soft)] mb-3">质量门禁拦截了 2 道题，包含语义错误与图文匹配问题。</p>
+      <a href="review.html" class="btn btn-ghost w-full">前往审校页面</a>
+      <div class="mt-4 pt-4 border-t border-[var(--line)]">
+        <h3 class="text-sm font-semibold mb-2">处理流程</h3>
+        <ol class="text-xs text-[var(--ink-soft)] space-y-1.5 list-decimal pl-4">
+          <li>上传教材 PDF / 扫描件</li>
+          <li>MinerU OCR 结构化解析</li>
+          <li>AI 自动出题</li>
+          <li>文本 + 视觉双模型审校</li>
+          <li>质量门禁校验，通过后入库</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const statusMap = {done:['已完成','tag-pass'], processing:['处理中','tag-pending']};
+document.getElementById('materialList').innerHTML = DOTTY_DATA.materials.map(m=>{
+  const [label,cls] = statusMap[m.status];
+  return `<div class="flex items-center justify-between border border-[var(--line)] rounded-xl p-3">
+    <div>
+      <div class="text-sm font-medium">${m.name}</div>
+      <div class="text-xs text-[var(--ink-soft)] mt-0.5">${m.pages} 页 · 上传于 ${m.uploadedAt}${m.questions?` · 已生成 ${m.questions} 题`:''}</div>
+    </div>
+    <span class="tag ${cls}">${label}</span>
+  </div>`;
+}).join('');
+</script>
+
+</body>
+</html>

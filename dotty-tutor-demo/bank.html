@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>题库管理 · Dotty Tutor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦉</text></svg>">
+<script src="assets/data.js"></script>
+
+
+</head>
+<body class="min-h-screen">
+<div class="flex">
+
+    <aside class="w-60 shrink-0 border-r border-[var(--line)] bg-white/70 min-h-screen p-4 flex flex-col gap-1">
+      <div class="flex items-center gap-2 px-2 pb-4 mb-2 border-b border-[var(--line)]">
+        <span class="text-2xl">🦉</span>
+        <div>
+          <div class="font-bold display text-[15px] leading-none">Dotty Tutor</div>
+          <div class="text-[11px] text-[var(--ink-soft)] mt-1">教研工作台</div>
+        </div>
+      </div>
+      <a href="teacher-dashboard.html" class="nav-link "><span>🏠</span><span>工作台首页</span></a>
+<a href="upload.html" class="nav-link "><span>📤</span><span>教材上传</span></a>
+<a href="review.html" class="nav-link "><span>🧪</span><span>AI 出题 & 审校</span></a>
+<a href="bank.html" class="nav-link active"><span>📚</span><span>题库管理</span></a>
+      <a href="login.html" class="nav-link mt-auto text-[var(--ink-soft)]"><span>↩️</span><span>退出登录</span></a>
+    </aside>
+    
+<main class="flex-1 min-h-screen">
+
+<div class="p-8 max-w-6xl">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="display text-2xl font-bold">题库管理</h1>
+      <p class="text-[var(--ink-soft)] text-sm mt-1">筛选、检索、预览、导出试题</p>
+    </div>
+    <button class="btn btn-ghost">⇩ 导出题库</button>
+  </div>
+
+  <div class="flex gap-2 mb-4 flex-wrap" id="filters"></div>
+
+  <div class="card overflow-hidden">
+    <table class="w-full text-sm">
+      <thead><tr class="text-left text-xs text-[var(--ink-soft)] bg-[#FAFAFB] border-b border-[var(--line)]">
+        <th class="py-3 px-4 font-medium">题干</th><th class="font-medium">题型</th><th class="font-medium">来源单元</th><th class="font-medium">状态</th>
+      </tr></thead>
+      <tbody id="bankTable"></tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+const types = ['全部', ...new Set(DOTTY_DATA.bank.map(b=>b.type))];
+let activeType = '全部';
+function renderFilters(){
+  document.getElementById('filters').innerHTML = types.map(t=>
+    `<button data-t="${t}" class="px-3 py-1.5 rounded-full text-xs font-medium border ${t===activeType?'bg-[var(--brand)] text-white border-[var(--brand)]':'border-[var(--line)] bg-white text-[var(--ink-soft)]'}">${t}</button>`
+  ).join('');
+  document.querySelectorAll('#filters button').forEach(b=>b.addEventListener('click', ()=>{activeType=b.dataset.t; renderFilters(); renderTable();}));
+}
+function renderTable(){
+  const statusCls = {'已入库':'tag-pass','待复核':'tag-pending','已拦截':'tag-fail'};
+  const rows = DOTTY_DATA.bank.filter(b=>activeType==='全部'||b.type===activeType);
+  document.getElementById('bankTable').innerHTML = rows.map(b=>`
+    <tr class="border-b border-[var(--line)] last:border-0 hover:bg-[#FAFAFB]">
+      <td class="py-3 px-4">${b.stem}</td>
+      <td><span class="tag tag-brand">${b.type}</span></td>
+      <td class="text-[var(--ink-soft)]">${b.unit}</td>
+      <td><span class="tag ${statusCls[b.status]}">${b.status}</span></td>
+    </tr>`).join('') || '<tr><td class="py-6 px-4 text-[var(--ink-soft)]" colspan="4">没有符合条件的题目</td></tr>';
+}
+renderFilters(); renderTable();
+</script>
+
+</body>
+</html>
